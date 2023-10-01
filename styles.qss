@@ -1,0 +1,17 @@
+
+
+// Remove border and background for normal state
+ui->btnGray->setStyleSheet(R"(
+QPushButton {
+    border: none;
+    background: transparent;
+}
+// Change the icon slightly when hovered
+QPushButton:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+// Darken the icon when pressed
+QPushButton:pressed {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+)");

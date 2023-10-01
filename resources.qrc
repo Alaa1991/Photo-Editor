@@ -1,0 +1,18 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>arrow-right.png</file>
+        <file>circle.png</file>
+        <file>color-palette.png</file>
+        <file>fire-symbol.png</file>
+        <file>greyscale.png</file>
+        <file>pencil.png</file>
+        <file>rounded-rectangle.png</file>
+        <file>star.png</file>
+        <file>text.png</file>
+        <file>trapezium.png</file>
+        <file>cleaning.png</file>
+        <file>illustration.png</file>
+        <file>eraser.png</file>
+        <file>line.png</file>
+    </qresource>
+</RCC>
