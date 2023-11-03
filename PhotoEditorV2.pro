@@ -3,9 +3,9 @@
 # Project created by QtCreator 2023-09-16T16:50:13
 #
 #-------------------------------------------------
-QMAKE_CXXFLAGS += -std=c++11
+#QMAKE_CXXFLAGS += -std=c++11
 QT       += core gui
-CONFIG += c++11
+CONFIG += c++17
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -20,6 +20,8 @@ SOURCES += main.cpp\
 
 HEADERS  += mainwindow.h \
     DrawingManager.h \
+    EdgeEnum.h \
+    TextTool.h \
     customgraphicsview.h
 
 FORMS    += mainwindow.ui

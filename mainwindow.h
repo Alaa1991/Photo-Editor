@@ -7,6 +7,7 @@
 #include <QMouseEvent>
 #include "DrawingManager.h"
 #include <QSlider>
+#include "EdgeEnum.h"
 
 class CustomGraphicsView;
 namespace Ui {
@@ -20,17 +21,24 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
 
-    enum DrawMode {
-        NoDraw,
-        DrawRect,
-        DrawCircle,
-        DrawBrush
-    };
+    // enum DrawMode {
+    //     NoDraw,
+    //     DrawRect,
+    //     DrawCircle,
+    //     DrawBrush
+    // };
 
 
     ~MainWindow();
 
-public slots:
+    void setProgrammaticChange(bool value)
+    { isProgrammaticChange = value; }
+    bool getProgrammaticChange() const
+    { return isProgrammaticChange; }
+
+
+
+
 
 private slots:
     void openImage();
@@ -40,17 +48,36 @@ private slots:
     void setDrawBrushMode();
     void setDrawLineMode();
     void setEraserMode();
+    void setMoveToolMode();
+    void setHandToolMode();
+
     void clearScene();
+    void pickColor();
+
+    void zoomIn();
+    void zoomOut();
 
     void onSizeChanged(int newSz);
     void onViewMousePressed(QMouseEvent* event);
     void onViewMouseMoved(QMouseEvent* event);
     void onViewMouseReleased(QMouseEvent* event);
 
+    void handleItemSelected(int opacity);
+    void handleItemDeselected();
+
+
+    void saveSettings();
+    void loadSettings();
+
+    void handToolEnabled();
+
+
 protected:
     void mousePressEvent(QMouseEvent* event);
     void mouseMoveEvent(QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);
+    void keyPressEvent(QKeyEvent *event);
+    void keyReleaseEvent(QKeyEvent *event);
 
 private:
 
@@ -61,9 +88,16 @@ private:
     void setupStyles();
     void setupConnections();
     void createWidgets();
+    void setupButtonGroups();
+
+    void resetZoom();
+
+    Edge isNearEdge(const QPointF &cursorPos, QGraphicsItem *item);
 
 
     void activateDrawButtons();
+
+
 
     QToolBar *drawingsToolbar;
     QToolBar *adjustmentsToolbar;
@@ -88,9 +122,31 @@ private:
     QGraphicsEllipseItem *tempCircle = nullptr;
     QPushButton *btnLine;
     QPushButton *btnEraser;
+    QPushButton *btnMove;
+    QSlider *szSlider;
+    QSlider *opacitySlider;
+    QGraphicsItem *selectedItem = nullptr;
+    QPushButton *colorPickerBtn;
+    QPushButton *btnLoad;
+    QPushButton *btnZoomIn;
+    QPushButton *btnZoomOut;
+    QPushButton *btnHandTool;
 
-    bool isPressing;
+
+    QButtonGroup *buttonGroup;
+
+    bool isProgrammaticChange = false;
+
+    bool isResizing = false;
+    bool isMoving = false;
+
+    Edge currentEdge = None;
+
+    const double zoomFactor = 1.5;
+
+
 //    QSlider *szSlider;
+
 };
 
 #endif // MAINWINDOW_H

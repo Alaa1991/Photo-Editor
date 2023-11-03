@@ -14,5 +14,10 @@
         <file>illustration.png</file>
         <file>eraser.png</file>
         <file>line.png</file>
+        <file>move.png</file>
+        <file>load.png</file>
+        <file>zoom-in.png</file>
+        <file>zoom-out.png</file>
+        <file>swipe-left.png</file>
     </qresource>
 </RCC>
