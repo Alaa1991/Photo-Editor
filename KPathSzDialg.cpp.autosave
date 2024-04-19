@@ -1,0 +1,6 @@
+
+
+#include "KPathSzDialg.h"
+
+PropertiesWindow::PropertiesWindow(QWidget *parent):
+    QDialog(pare)

@@ -12,15 +12,33 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = PhotoEditorV2
 TEMPLATE = app
 
+# INCLUDEPATH += /path/to/opencv/include
+# LIBS += -L/path/to/opencv/lib -lopencv_core -lopencv_highgui -lopencv_imgproc
 
 SOURCES += main.cpp\
     DrawingManager.cpp \
+    EventsManager.cpp \
+    KGraphicsScene.cpp \
+    KPathItem.cpp \
+    PropertiesWindow.cpp \
+    SaveWin.cpp \
+    SceneInfoWind.cpp \
+    TextTool.cpp \
         mainwindow.cpp \
     customgraphicsview.cpp
 
 HEADERS  += mainwindow.h \
+    AddShapeCommand.h \
     DrawingManager.h \
     EdgeEnum.h \
+    EventsManager.h \
+    KGraphicsScene.h \
+    KPathItem.h \
+    PropertiesWindow.h \
+    RemoveShapeCommand.h \
+    SaveWin.h \
+    SceneInfoWind.h \
+    ShapeType.h \
     TextTool.h \
     customgraphicsview.h
 

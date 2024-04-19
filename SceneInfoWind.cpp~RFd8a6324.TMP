@@ -1,0 +1,321 @@
+
+
+
+#include "SceneInfoWind.h"
+
+SceneInfoWindo::SceneInfoWindo(QGraphicsScene *scene, DrawingManager *dm,
+                               QWidget *parent)
+    :QDialog(parent), scene(scene),dm(dm)
+{
+    setWindowTitle(tr("Scene Items Info"));
+    setupButtons();
+    setupLayouts();
+    updateInfo();
+    setupConnections();
+
+
+
+    listWidget->installEventFilter(this);
+}
+
+
+void SceneInfoWindo::updateInfo()
+{
+    listWidget->clear();
+
+    int circleCount = 0,rectCount = 0,lineCount=0,
+        brushCount=0,starCount=0,arrowCount=0;
+
+    QList<QGraphicsItem*> items = scene->items();
+    std::reverse(items.begin(),items.end());
+
+    for(auto *item : items) {
+        KPathItem *kpathItem = dynamic_cast<KPathItem*>(item);
+
+        if(kpathItem) {
+            QString itemName;
+
+            switch(kpathItem->getShapeType()) {
+
+            case ShapeType::Circle:
+                itemName = QString("Circle%1").arg(++circleCount);
+                break;
+
+            case ShapeType::Rectangle:
+                itemName = QString("Rectangle%1").arg(++rectCount);
+                break;
+
+            case ShapeType::Arrow:
+                itemName = QString("Arrow%1").arg(++arrowCount);
+                break;
+
+            case ShapeType::Brush:
+                itemName = QString("Brush%1").arg(++brushCount);
+                break;
+
+            case ShapeType::Line:
+                itemName = QString("Line%1").arg(++lineCount);
+                break;
+
+            case ShapeType::Star:
+                itemName = QString("Star%1").arg(++starCount);
+                break;
+
+            }
+
+            kpathItem->setName(itemName);
+
+            // QListWidgetItem *listItem = new QListWidgetItem(itemName, listWidget);
+
+
+            QListWidgetItem *listWidgetItem = new QListWidgetItem(listWidget);
+            listWidgetItem->setFlags(listWidgetItem->flags() | Qt::ItemIsEditable);
+
+            QWidget *widget = new QWidget();
+            layoutWidget = new QHBoxLayout(widget);
+            // layoutWidget->setSpacing(1);
+
+
+            checkVisible = new QCheckBox();
+            checkVisible->setChecked(true);
+
+            connect(checkVisible,&QCheckBox::toggled,
+                    [kpathItem](bool checked){kpathItem->setVisible(checked);
+            });
+
+            label = new QLabel(itemName);
+
+            layoutWidget->addWidget(checkVisible, 0, Qt::AlignLeft);
+            layoutWidget->addWidget(label, 0, Qt::AlignLeft);
+
+            //This is to push the label to be near the checkbox
+            layoutWidget->addStretch(4);
+
+            // - The `setContentsMargins` method removes extra margins around
+            // the widgets inside the QHBoxLayout
+            layoutWidget->setContentsMargins(0, 0, 0, 0);
+            // layout->addStretch(1);
+
+
+            listWidgetItem->setSizeHint(widget->sizeHint());
+            listWidget->setItemWidget(listWidgetItem, widget);
+
+            listWidgetItem->setData(Qt::UserRole,QVariant::fromValue(
+                                                static_cast<void*>(kpathItem)));
+        }
+    }
+}
+
+
+void SceneInfoWindo::clearListItemsSelc()
+{
+    listWidget->clearSelection();
+}
+
+
+void SceneInfoWindo::selectItem(QGraphicsItem *item)
+{
+    qDebug() << __FUNCTION__;
+
+    if(!item)
+        return;
+
+    auto *kpathItem = dynamic_cast<KPathItem*>(item);
+
+    if(!kpathItem)
+        return;
+
+    for(int i = 0; i < listWidget->count(); ++i) {
+        QListWidgetItem *listItem = listWidget->item(i);
+
+        KPathItem *itemInList = static_cast<KPathItem*>(
+            listItem->data(Qt::UserRole).value<void*>());
+
+        if(itemInList == kpathItem) {
+            listWidget->setCurrentItem(listItem);
+            break;
+        }
+    }
+}
+
+bool SceneInfoWindo::eventFilter(QObject *watched, QEvent *event)
+{
+    if(watched == listWidget && event->type() == QEvent::KeyPress) {
+
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+        QListWidgetItem *lstItem = listWidget->currentItem();
+
+        if(keyEvent->key() == Qt::Key_Delete && listWidget->count() >= 1) {
+
+            KPathItem *kpathItem = static_cast<KPathItem*>(lstItem->data(
+                                                    Qt::UserRole).value<void*>());
+            deleteLstItem();
+            emit deleteItem(kpathItem);
+            return true;
+        }
+    }
+
+    return QDialog::eventFilter(watched, event);
+}
+
+
+void SceneInfoWindo::deleteLstItem()
+{
+    QListWidgetItem *selectedItem = listWidget->currentItem();
+
+    QGraphicsItem *item = static_cast<QGraphicsItem*>(selectedItem->data(
+                 Qt::UserRole).value<void*>());
+
+    emit deleteItem(item);
+
+    if(selectedItem) {
+        int row = listWidget->row(selectedItem);
+        listWidget->takeItem(row);
+        delete selectedItem;
+    }
+}
+
+
+void SceneInfoWindo::onItemDeleted(QGraphicsItem *item)
+{
+    qDebug() << __FUNCTION__;
+
+    if(!item) {
+        return;
+    }
+
+    auto kpathItem = dynamic_cast<KPathItem*>(item);
+    if(!kpathItem) return;
+
+
+    for(int i = 0; i < listWidget->count(); ++i) {
+
+        QListWidgetItem *lstItem = listWidget->item(i);
+
+        auto itmInLst = static_cast<KPathItem*>(lstItem->data(
+                                          Qt::UserRole).value<void*>());
+
+        if(itmInLst == kpathItem) {
+            int row = listWidget->row(lstItem);
+            listWidget->takeItem(row);
+            delete lstItem;
+            break;
+        }
+    }
+}
+
+void SceneInfoWindo::clearList()
+{
+    QList<QGraphicsItem*> sceneItems = scene->items();
+
+    for(auto *item : sceneItems) {
+        emit deleteItem(item);
+    }
+
+    listWidget->clear();
+
+}
+
+
+void SceneInfoWindo::setupButtons()
+{
+    btnClrList = new QPushButton(tr("Clear List"));
+    btnClrList->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
+
+    btnRemove = new QPushButton(tr("Remove"));
+    btnRemove->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+}
+
+
+void SceneInfoWindo::setupLayouts()
+{
+    layout = new QVBoxLayout(this);
+    listWidget = new QListWidget(this);
+
+    QHBoxLayout *buttonLayout = new QHBoxLayout();
+    buttonLayout->addWidget(btnClrList);
+    // buttonLayout->addStretch(1);
+    buttonLayout->addWidget(btnRemove);
+    buttonLayout->addStretch(5);
+
+    layout->addWidget(listWidget);
+    layout->addLayout(buttonLayout);
+
+}
+
+
+void SceneInfoWindo::setupConnections()
+{
+    connect(listWidget,&QListWidget::itemClicked,[this](QListWidgetItem *listItem) {
+        if(!listItem)
+            return;
+
+        KPathItem *kpathItem = static_cast<KPathItem*>(listItem->data(
+                                                                    Qt::UserRole).value<void*>());
+
+        emit itemClicked(kpathItem);
+    } );
+
+    connect(listWidget,&QListWidget::currentItemChanged,[this](
+                                                              QListWidgetItem *current, QListWidgetItem */*prev*/) {
+        if(!current) return;
+
+        KPathItem *kpathItem = static_cast<KPathItem*>(current->data(
+                                                                   Qt::UserRole).value<void*>());
+
+        emit itemClicked(kpathItem);
+    });
+
+    connect(listWidget,&QListWidget::itemDoubleClicked,[this](QListWidgetItem *lsItm) {
+        if(!lsItm) return;
+
+        KPathItem *kpathItem = static_cast<KPathItem*>(lsItm->data(
+                                                 Qt::UserRole).value<void*>());
+
+        emit itemDoubleClicked(kpathItem);
+    });
+
+    connect(dm,&DrawingManager::itemDeleted,this,&SceneInfoWindo::onItemDeleted);
+    //    connect(dm,&DrawingManager::itemSelected,this,&SceneInfoWindo::selectItem);
+
+    connect(dm,static_cast<void (DrawingManager::*)(QGraphicsItem*)>(
+                    &DrawingManager::itemSelected), this,
+            &SceneInfoWindo::selectItem);
+
+    connect(btnClrList,&QPushButton::clicked,this,&SceneInfoWindo::clearList);
+    connect(btnRemove,&QPushButton::clicked,this,&SceneInfoWindo::deleteLstItem);
+    connect(listWidget,&QListWidget::itemChanged,this,&SceneInfoWindo::itemRename);
+}
+
+
+void SceneInfoWindo::itemRename(QListWidgetItem *item)
+{
+    if(!item) return;
+
+    QString newName = item->text();
+
+    auto *kpathItem = static_cast<KPathItem*>(item->data(
+                                 Qt::UserRole).value<void*>());
+
+    if(kpathItem) {
+        kpathItem->setName(newName);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
