@@ -1,4 +1,6 @@
 debug/main.o
+debug/AdjustmentManager.o
+debug/AdjustmentWindow.o
 debug/DrawingManager.o
 debug/EventsManager.o
 debug/KGraphicsScene.o
@@ -11,6 +13,8 @@ debug/mainwindow.o
 debug/customgraphicsview.o
 debug/qrc_resources.o
 debug/moc_mainwindow.o
+debug/moc_AdjustmentManager.o
+debug/moc_AdjustmentWindow.o
 debug/moc_DrawingManager.o
 debug/moc_EventsManager.o
 debug/moc_KGraphicsScene.o

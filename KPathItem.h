@@ -20,18 +20,20 @@ public:
     KPathItem(const QPainterPath &path);
     KPathItem();
 
+    virtual ~KPathItem() {}
+
     //GETTERS AND SETTERS
     void initializeProp();
 
     void setSize(qreal width,qreal height);
 
-    int type() const override{return KPathItemType;}
+    int type() const override { return KPathItemType;}
 
     bool getLocked() const;
     void setLocked(bool val);
     // bool getColor() const;
     void setFillColor(const QColor &color);
-    QColor getFillFolor() const;
+    QColor getFillColor() const;
 
     void setIsSelected(bool val);
     bool getIsSelected() const;
@@ -87,7 +89,7 @@ private:
     int brushSize;
     bool isResizeable;
 
-    QList<KPathItem*> kpathArr;
+    // QList<KPathItem*> kpathArr;
 
     const int KPathItemType = QGraphicsItem::UserType+1;
     QPainterPath originalPath;

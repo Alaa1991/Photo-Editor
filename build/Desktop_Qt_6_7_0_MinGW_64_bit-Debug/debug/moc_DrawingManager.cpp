@@ -61,7 +61,6 @@ constexpr auto qt_meta_stringdata_CLASSDrawingManagerENDCLASS = QtMocHelpers::st
     "color",
     "setStarHeads",
     "heads",
-    "getHandBrushColor",
     "copyItems",
     "pasteItems",
     "deleteItem",
@@ -78,7 +77,7 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSDrawingManagerENDCLASS[] = {
       12,       // revision
        0,       // classname
        0,    0, // classinfo
-      21,   14, // methods
+      20,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -86,29 +85,28 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSDrawingManagerENDCLASS[] = {
       11,       // signalCount
 
  // signals: name, argc, parameters, tag, flags, initial metatype offsets
-       1,    2,  140,    2, 0x06,    1 /* Public */,
-       1,    1,  145,    2, 0x06,    4 /* Public */,
-       6,    0,  148,    2, 0x06,    6 /* Public */,
-       7,    0,  149,    2, 0x06,    7 /* Public */,
-       8,    0,  150,    2, 0x06,    8 /* Public */,
-       9,    1,  151,    2, 0x06,    9 /* Public */,
-      10,    1,  154,    2, 0x06,   11 /* Public */,
-      11,    1,  157,    2, 0x06,   13 /* Public */,
-      13,    1,  160,    2, 0x06,   15 /* Public */,
-      14,    1,  163,    2, 0x06,   17 /* Public */,
-      15,    0,  166,    2, 0x06,   19 /* Public */,
+       1,    2,  134,    2, 0x06,    1 /* Public */,
+       1,    1,  139,    2, 0x06,    4 /* Public */,
+       6,    0,  142,    2, 0x06,    6 /* Public */,
+       7,    0,  143,    2, 0x06,    7 /* Public */,
+       8,    0,  144,    2, 0x06,    8 /* Public */,
+       9,    1,  145,    2, 0x06,    9 /* Public */,
+      10,    1,  148,    2, 0x06,   11 /* Public */,
+      11,    1,  151,    2, 0x06,   13 /* Public */,
+      13,    1,  154,    2, 0x06,   15 /* Public */,
+      14,    1,  157,    2, 0x06,   17 /* Public */,
+      15,    0,  160,    2, 0x06,   19 /* Public */,
 
  // slots: name, argc, parameters, tag, flags, initial metatype offsets
-      16,    1,  167,    2, 0x0a,   20 /* Public */,
-      18,    1,  170,    2, 0x0a,   22 /* Public */,
-      20,    1,  173,    2, 0x0a,   24 /* Public */,
-      21,    1,  176,    2, 0x0a,   26 /* Public */,
-      24,    1,  179,    2, 0x0a,   28 /* Public */,
-      26,    0,  182,    2, 0x10a,   30 /* Public | MethodIsConst  */,
-      27,    0,  183,    2, 0x0a,   31 /* Public */,
-      28,    0,  184,    2, 0x0a,   32 /* Public */,
-      29,    1,  185,    2, 0x0a,   33 /* Public */,
-      30,    0,  188,    2, 0x0a,   35 /* Public */,
+      16,    1,  161,    2, 0x0a,   20 /* Public */,
+      18,    1,  164,    2, 0x0a,   22 /* Public */,
+      20,    1,  167,    2, 0x0a,   24 /* Public */,
+      21,    1,  170,    2, 0x0a,   26 /* Public */,
+      24,    1,  173,    2, 0x0a,   28 /* Public */,
+      26,    0,  176,    2, 0x0a,   30 /* Public */,
+      27,    0,  177,    2, 0x0a,   31 /* Public */,
+      28,    1,  178,    2, 0x0a,   32 /* Public */,
+      29,    0,  181,    2, 0x0a,   34 /* Public */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::Int, 0x80000000 | 4,    3,    5,
@@ -129,7 +127,6 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSDrawingManagerENDCLASS[] = {
     QMetaType::Void, QMetaType::Int,   12,
     QMetaType::Void, 0x80000000 | 22,   23,
     QMetaType::Void, QMetaType::Int,   25,
-    QMetaType::QColor,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void, 0x80000000 | 4,    5,
@@ -192,8 +189,6 @@ Q_CONSTINIT const QMetaObject DrawingManager::staticMetaObject = { {
         // method 'setStarHeads'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         QtPrivate::TypeAndForceComplete<const int &, std::false_type>,
-        // method 'getHandBrushColor'
-        QtPrivate::TypeAndForceComplete<QColor, std::false_type>,
         // method 'copyItems'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'pasteItems'
@@ -229,12 +224,10 @@ void DrawingManager::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
         case 13: _t->changeBorderSz((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
         case 14: _t->setHandBrushColor((*reinterpret_cast< std::add_pointer_t<QColor&>>(_a[1]))); break;
         case 15: _t->setStarHeads((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
-        case 16: { QColor _r = _t->getHandBrushColor();
-            if (_a[0]) *reinterpret_cast< QColor*>(_a[0]) = std::move(_r); }  break;
-        case 17: _t->copyItems(); break;
-        case 18: _t->pasteItems(); break;
-        case 19: _t->deleteItem((*reinterpret_cast< std::add_pointer_t<QGraphicsItem*>>(_a[1]))); break;
-        case 20: _t->selectAllItems(); break;
+        case 16: _t->copyItems(); break;
+        case 17: _t->pasteItems(); break;
+        case 18: _t->deleteItem((*reinterpret_cast< std::add_pointer_t<QGraphicsItem*>>(_a[1]))); break;
+        case 19: _t->selectAllItems(); break;
         default: ;
         }
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
@@ -282,7 +275,7 @@ void DrawingManager::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
                 *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType::fromType< QGraphicsItem* >(); break;
             }
             break;
-        case 19:
+        case 18:
             switch (*reinterpret_cast<int*>(_a[1])) {
             default: *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType(); break;
             case 0:
@@ -391,13 +384,13 @@ int DrawingManager::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 21)
+        if (_id < 20)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 21;
+        _id -= 20;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 21)
+        if (_id < 20)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 21;
+        _id -= 20;
     }
     return _id;
 }

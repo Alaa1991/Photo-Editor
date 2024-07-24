@@ -5,6 +5,8 @@
 #-------------------------------------------------
 #QMAKE_CXXFLAGS += -std=c++11
 QT       += core gui
+QT += concurrent
+QT += core gui concurrent
 CONFIG += c++17
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -16,6 +18,8 @@ TEMPLATE = app
 # LIBS += -L/path/to/opencv/lib -lopencv_core -lopencv_highgui -lopencv_imgproc
 
 SOURCES += main.cpp\
+    AdjustmentManager.cpp \
+    AdjustmentWindow.cpp \
     DrawingManager.cpp \
     EventsManager.cpp \
     KGraphicsScene.cpp \
@@ -29,6 +33,8 @@ SOURCES += main.cpp\
 
 HEADERS  += mainwindow.h \
     AddShapeCommand.h \
+    AdjustmentManager.h \
+    AdjustmentWindow.h \
     DrawingManager.h \
     EdgeEnum.h \
     EventsManager.h \

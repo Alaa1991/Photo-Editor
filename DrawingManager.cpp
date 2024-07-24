@@ -903,17 +903,8 @@ void DrawingManager::deleteSelectedItems()
 
 void DrawingManager::deleteItem(QGraphicsItem *item)
 {
-//     qDebug() << __FUNCTION__;
+    qDebug() << __FUNCTION__ << " inside DM\n";
 
-//    KPathItem *kpathItem = dynamic_cast<KPathItem*>(item);
-
-//    if(kpathItem && !kpathItem->getLocked()) {
-
-//        emit itemDeleted(item);
-//        scene->removeItem(item);
-//        delete item;
-//        selectedItems.removeOne(item);
-//    }
 
      CustomGroup *group = findGroup(item);
 
@@ -939,13 +930,20 @@ void DrawingManager::deleteItem(QGraphicsItem *item)
 
      } else {
         // Handle non-grouped items
+         qDebug() << " delete a single item\n";
         deleteSingleItem(item);
      }
 }
 
 void DrawingManager::deleteSingleItem(QGraphicsItem *item)
 {
-//     qDebug() << __FUNCTION__;
+    qDebug() << __FUNCTION__ << " Deleting single item";
+
+    if(item == nullptr) {
+        qDebug() << "Null item passed to deleteSingleItem";
+        return;
+    }
+
      KPathItem *kpathItem = dynamic_cast<KPathItem*>(item);
      QGraphicsTextItem *textItem = dynamic_cast<QGraphicsTextItem*>(item);
 
@@ -953,6 +951,7 @@ void DrawingManager::deleteSingleItem(QGraphicsItem *item)
         emit itemDeleted(item);
         scene->removeItem(item);
         delete item;
+        qDebug() << " 3\n";
         selectedItems.removeOne(item);
      } else if(textItem) {
         emit itemDeleted(item);
@@ -996,7 +995,14 @@ void DrawingManager::changeItemsFillColor(QColor &color)
     for(QGraphicsItem *item : selectedItems) {
         KPathItem *pathItem = dynamic_cast<KPathItem*>(item);
         if(pathItem && !pathItem->getLocked()) {
-            // pathItem->setBrush(color);
+
+
+            if(shapeTypeMap[pathItem] != ShapeType::Brush) {
+               color.setAlpha(opacityVal);
+            }
+
+            pathItem->setLastModifiedTime(QDateTime::currentDateTime());
+
             pathItem->setFillColor(color);
             pathItem->setLastModifiedTime(QDateTime::currentDateTime());
             originalBrushes[pathItem] = color;

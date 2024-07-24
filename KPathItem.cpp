@@ -42,9 +42,10 @@ void KPathItem::setLocked(bool val)
     isLocked = val;
 }
 
-QColor KPathItem::getFillFolor() const
+QColor KPathItem::getFillColor() const
 {
-    return fillColor;
+    // return fillColor;
+    return this->brush().color();
 }
 
 void KPathItem::setFillColor(const QColor &color)

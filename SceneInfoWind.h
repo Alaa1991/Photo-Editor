@@ -16,6 +16,7 @@
 #include <QInputDialog>
 #include <QMap>
 #include <QRegularExpression>
+#include <QVariant>
 
 class SceneInfoWindo : public QDialog {
     Q_OBJECT
@@ -55,11 +56,14 @@ private:
 
     QGraphicsScene *scene;
     QVBoxLayout *layout;
+
     QListWidget *listWidget;
+
     DrawingManager *dm;
     QCheckBox *checkVisible;
     QHBoxLayout *layoutWidget;
     QLabel *label;
+
     QPushButton *btnClrList;
     QPushButton *btnRemove;
     QPushButton *btnRename;

@@ -156,6 +156,8 @@ public:
 
     ~DrawingManager();
 
+    QColor getHandBrushColor() const;
+
 public slots:
 
     void setToolSize(int newSz);
@@ -164,7 +166,6 @@ public slots:
     void changeBorderSz(int sz);
     void setHandBrushColor(QColor &color);
     void setStarHeads(const int& heads);
-    QColor getHandBrushColor() const;
 
     void copyItems();
     void pasteItems();

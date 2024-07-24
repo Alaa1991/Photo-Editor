@@ -27,6 +27,8 @@
 #include <QWidgetList>
 #include "KGraphicsScene.h"
 #include "SaveWin.h"
+#include "AdjustmentManager.h"
+#include "AdjustmentWindow.h"
 
 class CustomGraphicsView;
 namespace Ui {
@@ -57,6 +59,7 @@ private slots:
     // bool saveImageAs(QGraphicsScene *scene);
     void saveImage();
     void convertToGrayscale();
+
     void setDrawRectMode();
     void setDrawCircleMode();
     void setDrawBrushMode();
@@ -139,6 +142,8 @@ private slots:
     void groupItems();
     void ungroupItems();
 
+    void resetAdjustments();
+
 protected:
     void mousePressEvent(QMouseEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
@@ -157,7 +162,7 @@ private:
     void setupConnections();
     void setupActions();
     void setupMenues();
-
+    void setupAdjustments();
     void createUtilityWindow();
     void createTextWindow();
     void setupButtonGroups();
@@ -324,13 +329,14 @@ private:
     QStringList filters = {"PNG (*.png)", "JPEG (*.jpg;*.jpeg)",
                            "BMP (*.bmp)", "GIF (*.gif)"};
 
+    QGraphicsPixmapItem *currentImage;
 
-    // QMenu *contextMenu;
+    AdjustmentManager *adjustmentManager;
+    AdjustmentWindow *adjustmentWindow;
 
-    // QMenu contextMenu;
 
-//    QSlider *szSlider;
-
+    QSettings settings;
+    int lastOPacity = 100;
 };
 
 #endif // MAINWINDOW_H

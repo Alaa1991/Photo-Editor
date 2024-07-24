@@ -173,18 +173,34 @@ void SceneInfoWindo::selectItem(QGraphicsItem *item)
 
 bool SceneInfoWindo::eventFilter(QObject *watched, QEvent *event)
 {
+    // qDebug() << "I am the delete of event filter called first?\n";
     if(watched == listWidget && event->type() == QEvent::KeyPress) {
 
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
         QListWidgetItem *lstItem = listWidget->currentItem();
 
-        if(keyEvent->key() == Qt::Key_Delete && listWidget->count() >= 1) {
+        if(keyEvent->key() == Qt::Key_Delete && lstItem != nullptr) {
 
-            KPathItem *kpathItem = static_cast<KPathItem*>(lstItem->data(
-                                                    Qt::UserRole).value<void*>());
-            deleteLstItem();
-            emit deleteItem(kpathItem);
-            return true;
+            // KPathItem *kpathItem = static_cast<KPathItem*>(lstItem->data(
+                                                    // Qt::UserRole).value<void*>());
+            QVariant itemData = lstItem->data(Qt::UserRole);
+
+
+            if(!itemData.canConvert<KPathItem*>()) {
+                qDebug() << "Cannot convert item data to KpathItem*";
+                return false;
+            }
+            KPathItem *kpathItem = qvariant_cast<KPathItem*>(itemData);
+            if(!scene->items().contains(kpathItem)) {
+                qDebug() << "kpathitem  Not there in the scene\n";
+            }
+
+            if(kpathItem) {
+                qDebug() << "Suprised I am 10\n";
+                deleteLstItem();
+                emit deleteItem(kpathItem);
+                return true;
+            }
         }
 
         if(keyEvent->key() == Qt::Key_F2) {
@@ -199,45 +215,59 @@ bool SceneInfoWindo::eventFilter(QObject *watched, QEvent *event)
 
 void SceneInfoWindo::deleteLstItem()
 {
-
+    qDebug() << __FUNCTION__ << " inside SCeneInfoClass\n";
     QListWidgetItem *selectedItem = listWidget->currentItem();
 
-    if(!selectedItem)
+    if(!selectedItem) {
+        qDebug() << "No item selected or item already deleted.";
         return;
+    }
 
-    QGraphicsItem *item = static_cast<QGraphicsItem*>(selectedItem->data(
-                 Qt::UserRole).value<void*>());
+    // QGraphicsItem *item = static_cast<QGraphicsItem*>(selectedItem->data(
+    //              Qt::UserRole).value<void*>());
 
-    auto *kpathItem = static_cast<KPathItem*>(item);
+    QVariant itemData = selectedItem->data(Qt::UserRole);
+    if(!itemData.canConvert<KPathItem*>()) {
+        qDebug() << "Stored item data is not a KPathItem*";
+        return;
+    }
+
+    KPathItem *item = qvariant_cast<KPathItem*>(itemData);
+    if(!item) {
+        qDebug() << "Item already deleted of invalid\n";
+        return;
+    }
+
 
     emit deleteItem(item);
 
     int row = listWidget->row(selectedItem);
     listWidget->takeItem(row);
-
-    if(kpathItem) {
-        // ShapeType type = kpathItem->getShapeType();
-        // int number = extractNumFromNames(itemNames.value(kpathItem));
-        //  // Add the number back to the available numbers for reuse
-        // avialableNumbers[type].insert(number);
-        itemNames.remove(kpathItem);
-    }
-
-
     delete selectedItem;
+    itemNames.remove(item);
+
+
+    // if(kpathItem) {
+    //     // ShapeType type = kpathItem->getShapeType();
+    //     // int number = extractNumFromNames(itemNames.value(kpathItem));
+    //     //  // Add the number back to the available numbers for reuse
+    //     // avialableNumbers[type].insert(number);
+    //     itemNames.remove(kpathItem);
+    // }
+
+
 }
 
 
 void SceneInfoWindo::onItemDeleted(QGraphicsItem *item)
 {
-
+    qDebug() << __FUNCTION__ << " in SceneInfoWindow\n";
     if(!item) {
         return;
     }
 
     auto kpathItem = dynamic_cast<KPathItem*>(item);
     if(!kpathItem) return;
-
 
     for(int i = 0; i < listWidget->count(); ++i) {
 
@@ -247,12 +277,9 @@ void SceneInfoWindo::onItemDeleted(QGraphicsItem *item)
                                           Qt::UserRole).value<void*>());
 
         if(itmInLst == kpathItem) {
+
             int row = listWidget->row(lstItem);
-            listWidget->takeItem(row);
-
-            // switch(itmInLst->getShapeType()) {
-
-            // }
+            listWidget->takeItem(row);          
 
             itemNames.remove(itmInLst);
             delete lstItem;
@@ -272,8 +299,7 @@ void SceneInfoWindo::clearList()
     itemNames.clear();
     listWidget->clear();
     displayedItems.clear();
-    // avialableNumbers.clear();
-    // resetVars();
+
 }
 
 

@@ -23,7 +23,7 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),settings("K&K", "KDitor")
 {
     ui->setupUi(this);
 
@@ -31,18 +31,22 @@ MainWindow::MainWindow(QWidget *parent) :
     scene->setBackgroundBrush(Qt::transparent);
     ui->graphicsView->setScene(scene);
 
+
     undoStack = new QUndoStack(this);
     drawingManager = new DrawingManager(scene);
     eventsManager = new EventsManager(scene, drawingManager);
     textTool = new TextTool(scene);
     propWin = new PropertiesWindow(this);
     infoWin = new SceneInfoWindo(scene, drawingManager, this);
+    adjustmentManager = new AdjustmentManager(scene);
+    adjustmentWindow = new AdjustmentWindow(this);
 
+    currentImage = nullptr;
     //Buttons Setup
     setupButtons();
     setupLayouts();
     setupToolbar();
-
+    setupAdjustments();
     setupButtonGroups();
 
     setupActions();
@@ -98,22 +102,51 @@ MainWindow::~MainWindow()
     delete textTool;
     delete propWin;
     delete infoWin;
+    delete adjustmentManager;
+    delete adjustmentWindow;
 }
 
 void MainWindow::openImage()
 {
+    qDebug() << __FUNCTION__;
 
+    QString initialDir = settings.value("lastUsedDir", QDir::homePath()).toString();
 
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), "", tr("Images (*.png *.xpm *.jpg *.bmp)"));
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"),
+                                initialDir, tr("Images (*.png *.xpm *.jpg *.bmp)"));
 
     if(!fileName.isEmpty()) {
         QImage image(fileName);
         drawingManager->deleteSelectedItems();
+        // QGraphicsPixmapItem* background = new QGraphicsPixmapItem(QPixmap::fromImage(image));
+
+        //Without this if we will have a crush due to double deletion of currentimage
+        if(currentImage) {
+            scene->removeItem(currentImage);
+            delete currentImage;
+            currentImage = nullptr;
+        }
+
         scene->clear();
-        QGraphicsPixmapItem* background = new QGraphicsPixmapItem(QPixmap::fromImage(image));
-        // background->setZValue(-1);  // Ensure the background is always at the bottom
-        scene->addItem(background);
-        ui->graphicsView->fitInView(scene->sceneRect(),Qt::KeepAspectRatio);
+
+        currentImage = new QGraphicsPixmapItem(QPixmap::fromImage(image));
+
+        scene->addItem(currentImage);
+
+        // scene->setSceneRect(QRectF(0, 0, image.width(), image.height()));
+
+        // ui->graphicsView->fitInView(scene->sceneRect(),Qt::KeepAspectRatio);
+        ui->graphicsView->resetTransform();
+        ui->graphicsView->setSceneRect(currentImage->boundingRect());
+        ui->graphicsView->fitInView(currentImage, Qt::KeepAspectRatio);
+
+        resetAdjustments();
+        adjustmentManager->loadImage(currentImage);
+
+        // Update the last used directory
+        QFileInfo fileInfo(fileName);
+        settings.setValue("lastUsedDir", fileInfo.absolutePath());
+        qDebug() << "Updated last used directory to:" << fileInfo.absolutePath();
     }
 }
 
@@ -320,6 +353,9 @@ void MainWindow::clearScene()
     btnEraser->setCheckable(false);
     btnMove->setCheckable(false);
     btnTextTool->setCheckable(false);
+
+    // currentImage = nullptr;
+    // delete currentImage;
 }
 
 void MainWindow::activateDrawButtons()
@@ -800,11 +836,11 @@ void MainWindow::setupConnections()
                                     &MainWindow::onContextMenuRequested);
 
     //CONTEXT MENU connections
-    connect(copyAction,QAction::triggered,drawingManager,
+    connect(copyAction,&QAction::triggered,drawingManager,
                 &DrawingManager::copyItems);
-    connect(pasteAction,QAction::triggered,drawingManager,
+    connect(pasteAction,&QAction::triggered,drawingManager,
             &DrawingManager::pasteItems);
-    connect(propAction,QAction::triggered,this,&MainWindow::showPropWindow);
+    connect(propAction,&QAction::triggered,this,&MainWindow::showPropWindow);
     connect(sendBackAction,&QAction::triggered,this,&MainWindow::sendToBack);
     connect(sendFrontAction,&QAction::triggered,this,&MainWindow::sendToFront);
 
@@ -928,7 +964,7 @@ void MainWindow::createUtilityWindow()
 
 
     borderSizeSpin = new QSpinBox;
-    borderSizeSpin->setRange(1, 50);
+    borderSizeSpin->setRange(0, 50);
     borderSizeSpin->setEnabled(false);
     borderSzLabel = new QLabel(tr("Border Size"));
 
@@ -1338,7 +1374,7 @@ void MainWindow::setupButtonGroups()
 
 void MainWindow::saveSettings()
 {
-    QSettings settings("K&K", "KDITOR");
+    // QSettings settings("K&K", "KDitor");
 
     QColor lastColor = drawingManager->brushColor();
 
@@ -1348,9 +1384,10 @@ void MainWindow::saveSettings()
 
     settings.setValue("lastColor", colorStr);
 
-    qDebug() << "Saving color:" << colorStr;
+
 
     int brushThickness = drawingManager->getToolSize();
+
     settings.setValue("brushThickness", brushThickness);
 
     qDebug() << "Saving brush thickness:" << brushThickness;
@@ -1360,7 +1397,7 @@ void MainWindow::saveSettings()
 void MainWindow::loadSettings()
 {
 
-    QSettings settings("K&K", "KDITOR");
+    QSettings settings("K&K", "KDitor");
 
 
     // Load the saved color string, default to black if not found
@@ -1456,6 +1493,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 
 
     if(event->key() == Qt::Key_Delete) {
+        qDebug() << "Delete Key handled by MainWindow MW\n";
         drawingManager->deleteSelectedItems();
     }
 
@@ -1831,7 +1869,7 @@ void MainWindow::updatePropWindow(QGraphicsItem *item)
 
     if(kpathItem) {
 
-        propWin->setFillClr(kpathItem->getFillFolor());
+        propWin->setFillClr(kpathItem->getFillColor());
 
         propWin->setBorderClor(kpathItem->getBorderColor());
 
@@ -1984,7 +2022,8 @@ void MainWindow::onListItemClicked(QGraphicsItem *item)
 
 void MainWindow::deleteLstItem(QGraphicsItem *item)
 {
-    qDebug() << __FUNCTION__;
+    qDebug() << __FUNCTION__ << " inside MW\n";
+    qDebug() << __FUNCTION__ << " deleteItem is emitted and mw recieved it\n";
 
     drawingManager->deleteItem(item);
 }
@@ -2077,9 +2116,51 @@ void MainWindow::saveImage()
     saveDialog.exec();
 }
 
+void MainWindow::setupAdjustments()
+{
+    qDebug() << __FUNCTION__;
+
+    QDockWidget *dockAdjustment = new QDockWidget("Adjustments", this);
+    dockAdjustment->setWidget(adjustmentWindow);
+
+
+    addDockWidget(Qt::RightDockWidgetArea, dockAdjustment);
+
+    connect(adjustmentWindow,&AdjustmentWindow::hueChanged,this,[this](double hue){
+
+        if(!currentImage) {
+            qDebug() << "No image loaded yet\n";
+            return;
+        }
+
+        // // QGraphicsPixmapItem *item = currentImage;
+        // if(currentImage) {
+            adjustmentManager->adjustHue(currentImage, hue);
+        // }
+    });
+
+    connect(adjustmentWindow,&AdjustmentWindow::saturationChanged,this,
+            [this](double saturation) {
+
+                if(!currentImage) {
+
+                     qDebug() << "No image loaded to satruate\n";
+                    return;
+                }
+
+                // // QGraphicsPixmapItem *item = currentImage;
+                // if(currentImage) {
+            adjustmentManager->adjustSaturation(currentImage, saturation);
+        // }
+    });
+}
 
 
 
+void MainWindow::resetAdjustments()
+{
+    adjustmentWindow->reset();
+}
 
 
 

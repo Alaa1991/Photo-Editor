@@ -1,4 +1,6 @@
 release/main.o
+release/AdjustmentManager.o
+release/AdjustmentWindow.o
 release/DrawingManager.o
 release/EventsManager.o
 release/KGraphicsScene.o
@@ -11,6 +13,8 @@ release/mainwindow.o
 release/customgraphicsview.o
 release/qrc_resources.o
 release/moc_mainwindow.o
+release/moc_AdjustmentManager.o
+release/moc_AdjustmentWindow.o
 release/moc_DrawingManager.o
 release/moc_EventsManager.o
 release/moc_KGraphicsScene.o
